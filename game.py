@@ -3,14 +3,14 @@ import numpy as np
 import pygame
 import random
 import threading
-from cockroach_game import Cockroach
+from cockroach import Cockroach
 
 # Initialize Pygame
 pygame.init()
 
 # Define screen dimensions
-SCREEN_WIDTH = 802
-SCREEN_HEIGHT = 601
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 400
 
 # Load cockroach image
 cockroach_image = pygame.image.load('res/cockroach.png')
@@ -87,7 +87,7 @@ class MyGame:
             frame_pygame = pygame.surfarray.make_surface(frame_rgb)
 
             # Draw the camera feed as the background
-            self.screen.blit(frame_pygame, (80, 60))
+            self.screen.blit(frame_pygame, (0, 0))
 
             # Draw the cockroach panel on top of the camera feed
             for cockroach in cockroaches:
