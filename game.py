@@ -57,8 +57,10 @@ class MyGame:
                 self.asteroids.remove(asteroid)
     
     def detect_collision(self, x, y):
+        cockroaches_copy = self.cockroaches.copy()
+
         # Iterate through the list of cockroaches
-        for cockroach in self.cockroaches:
+        for cockroach in cockroaches_copy:
             # Check if the detection rectangle intersects with the cockroach
             if x < cockroach.x < x + self.w and y < cockroach.y < y + self.h:
                 # Remove the cockroach from the list
