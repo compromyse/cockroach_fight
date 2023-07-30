@@ -15,13 +15,14 @@ pygame.init()
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 400
 
-# Load cockroach image
-cockroach_image = pygame.image.load('res/cockroach.png')
-
 class MyGame:
     def __init__(self) -> None:
         # Open the webcam (0 is usually the default)
         self.cap = cv2.VideoCapture(0)
+
+        # Create a list to hold cockroaches
+        self.cockroaches = []
+        self.asteroids = []
 
         # Create the game screen
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -32,11 +33,30 @@ class MyGame:
 
         # Create an event to signal the camera feed thread to stop
         self.stop_event = threading.Event()
+    
+    def spawn_objects(self):
+        # Spawn a new cockroach randomly
+        if len(self.cockroaches) < 5 and random.random() < 0.02:
+            self.cockroaches.append(Cockroach())
 
-    def run_cockroach_game(self):
-        # Create a list to hold cockroaches
-        cockroaches = []
-        asteroids = []
+        # Spawn a new asteroid randomly
+        if len(self.asteroids) < 5 and random.random() < 0.02:
+            self.asteroids.append(Asteroid())
+
+    def move_objects(self):
+        # Move cockroaches downwards and remove off-screen ones
+        for cockroach in self.cockroaches:
+            cockroach.move_down()
+            if cockroach.y >= SCREEN_HEIGHT:
+                self.cockroaches.remove(cockroach)
+
+        # Move asteroid downwards and remove off-screen ones
+        for asteroid in self.asteroids:
+            asteroid.move_down()
+            if asteroid.y >= SCREEN_HEIGHT:
+                self.asteroids.remove(asteroid)
+
+    def start_game(self):
 
         while not self.stop_event.is_set():
             for event in pygame.event.get():
@@ -44,25 +64,8 @@ class MyGame:
                     # Set the stop event when the 'x' button is clicked
                     self.stop_event.set()
 
-            # Spawn a new cockroach randomly
-            if len(cockroaches) < 5 and random.random() < 0.02:
-                cockroaches.append(Cockroach())
-
-            # Move cockroaches downwards and remove off-screen ones
-            for cockroach in cockroaches:
-                cockroach.move_down()
-                if cockroach.y >= SCREEN_HEIGHT:
-                    cockroaches.remove(cockroach)
-
-            # Spawn a new asteroid randomly
-            if len(asteroids) < 5 and random.random() < 0.02:
-                asteroids.append(Asteroid())
-
-            # Move asteroid downwards and remove off-screen ones
-            for asteroid in asteroids:
-                asteroid.move_down()
-                if asteroid.y >= SCREEN_HEIGHT:
-                    asteroids.remove(asteroid)
+            self.spawn_objects()
+            self.move_objects()
 
             # Read frame from the webcam
             ret, frame = self.cap.read()
@@ -104,11 +107,11 @@ class MyGame:
             self.screen.blit(frame_pygame, (0, 0))
 
             # Draw the cockroach panel on top of the camera feed
-            for cockroach in cockroaches:
+            for cockroach in self.cockroaches:
                 cockroach.draw(self.screen)
 
             # Draw the cockroach panel on top of the camera feed
-            for asteroid in asteroids:
+            for asteroid in self.asteroids:
                 asteroid.draw(self.screen)
 
             # Update the display
@@ -122,7 +125,7 @@ class MyGame:
 
     def loop(self) -> None:
         # Start the webcam feed and cockroach panel in separate threads
-        cockroach_thread = threading.Thread(target=self.run_cockroach_game)
+        cockroach_thread = threading.Thread(target=self.start_game)
         cockroach_thread.start()
 
         while self.running:
