@@ -41,6 +41,7 @@ class MyGame:
         # Game state variables
         self.lives = 5
         self.game_over = False
+        self.score = 0
 
     def spawn_objects(self):
         # Spawn a new cockroach randomly
@@ -79,10 +80,11 @@ class MyGame:
             detection_top = y
             detection_bottom = y + h
 
-            # Check for overlap
+            # Check for overlap and update score if a cockroach is hit
             if (cockroach_right >= detection_left and cockroach_left <= detection_right) and \
                (cockroach_bottom >= detection_top and cockroach_top <= detection_bottom):
                 cockroaches_to_remove.append(cockroach)
+                self.score += 1
 
         for cockroach in cockroaches_to_remove:
             self.cockroaches.remove(cockroach)
@@ -106,12 +108,12 @@ class MyGame:
             if (asteroid_right >= detection_left and asteroid_left <= detection_right) and \
                (asteroid_bottom >= detection_top and asteroid_top <= detection_bottom):
                 asteroids_to_remove.append(asteroid)
+                self.lives -= 1
+                if self.lives == 0:
+                    self.game_over = True
 
         for asteroid in asteroids_to_remove:
             self.asteroids.remove(asteroid)
-            self.lives -= 1
-            if self.lives == 0:
-                self.game_over = True
 
     def draw_text(self, text, color, x, y):
         text_surface = self.font.render(text, True, color)
@@ -155,7 +157,6 @@ class MyGame:
             green_mask2 = cv2.inRange(det_frame, lower_green2, upper_green2)
             green_mask = cv2.bitwise_or(green_mask1, green_mask2)
 
-
             # Detect contours            
             contours, _ = cv2.findContours(green_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             
@@ -188,6 +189,9 @@ class MyGame:
             # Draw the lives count
             self.draw_text("Lives: " + str(self.lives), (255, 255, 255), SCREEN_WIDTH - 70, 10)
 
+            # Draw the score count
+            self.draw_text("Score: " + str(self.score), (255, 255, 255), 70, 10)
+
             # Update the display
             pygame.display.flip()
 
@@ -198,6 +202,14 @@ class MyGame:
         if self.game_over:
             self.screen.fill((0, 0, 0))
             self.draw_text("Game Over", (255, 0, 0), SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+            pygame.display.flip()
+            # Wait for a few seconds before stopping the game
+            pygame.time.wait(2000)
+
+        # Check for victory condition (score reaches 10)
+        if self.score >= 10:
+            self.screen.fill((0, 0, 0))
+            self.draw_text("You Won!", (0, 255, 0), SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
             pygame.display.flip()
             # Wait for a few seconds before stopping the game
             pygame.time.wait(2000)
