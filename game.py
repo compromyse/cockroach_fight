@@ -115,7 +115,11 @@ class MyGame:
 
             # Draw the camera feed as the background
             self.screen.blit(frame_pygame, (0, 0))
-            self.detect_collision(x,y)
+
+            try:
+                self.detect_collision(x,y)
+            except:
+                print('passing')
             # Draw the cockroach panel x,yon top of the camera feed
             for cockroach in self.cockroaches:
                 cockroach.draw(self.screen)
