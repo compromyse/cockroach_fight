@@ -4,6 +4,7 @@ import numpy as np
 import pygame
 import random
 import threading
+import sys
 
 from cockroach import Cockroach
 from asteroid import Asteroid
@@ -28,12 +29,19 @@ class MyGame:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption('Camera Feed and Cockroach Panel')
 
+        # Load font
+        self.font = pygame.font.SysFont(None, 40)
+
         # Track whether the Pygame window should be closed
         self.running = True
 
         # Create an event to signal the camera feed thread to stop
         self.stop_event = threading.Event()
-    
+
+        # Game state variables
+        self.lives = 5
+        self.game_over = False
+
     def spawn_objects(self):
         # Spawn a new cockroach randomly
         if len(self.cockroaches) < 5 and random.random() < 0.02:
@@ -55,7 +63,7 @@ class MyGame:
             asteroid.move_down()
             if asteroid.y >= SCREEN_HEIGHT:
                 self.asteroids.remove(asteroid)
-    
+
     def detect_collision_cockroach(self, x, y, w, h):
         cockroaches_to_remove = []
         for cockroach in self.cockroaches:
@@ -82,7 +90,7 @@ class MyGame:
     def detect_collision_asteroid(self, x, y, w, h):
         asteroids_to_remove = []
         for asteroid in self.asteroids:
-            # Calculate left, right, top, and bottom boundaries of the cockroach
+            # Calculate left, right, top, and bottom boundaries of the asteroid
             asteroid_left = asteroid.x
             asteroid_right = asteroid.x + asteroid.width
             asteroid_top = asteroid.y
@@ -100,12 +108,20 @@ class MyGame:
                 asteroids_to_remove.append(asteroid)
 
         for asteroid in asteroids_to_remove:
-            # TODO: GAME OVER AFTER HITTING 5
-            print('detected')
+            self.asteroids.remove(asteroid)
+            self.lives -= 1
+            if self.lives == 0:
+                self.game_over = True
+
+    def draw_text(self, text, color, x, y):
+        text_surface = self.font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        text_rect.midtop = (x, y)
+        self.screen.blit(text_surface, text_rect)
 
     def start_game(self):
 
-        while not self.stop_event.is_set():
+        while not self.stop_event.is_set() and not self.game_over:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     # Set the stop event when the 'x' button is clicked
@@ -163,11 +179,22 @@ class MyGame:
             for asteroid in self.asteroids:
                 asteroid.draw(self.screen)
 
+            # Draw the lives count
+            self.draw_text("Lives: " + str(self.lives), (255, 255, 255), SCREEN_WIDTH - 70, 10)
+
             # Update the display
             pygame.display.flip()
 
         # Release the captured webcam
         self.cap.release()
+
+        # If the game is over, show "Game Over" message
+        if self.game_over:
+            self.screen.fill((0, 0, 0))
+            self.draw_text("Game Over", (255, 0, 0), SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+            pygame.display.flip()
+            # Wait for a few seconds before stopping the game
+            pygame.time.wait(2000)
 
         # Destroy all CV2 Windows
         cv2.destroyAllWindows()
