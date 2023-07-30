@@ -8,6 +8,9 @@ class Cockroach:
         self.y = 60  # Starting y position at the top
         self.speed_y = random.randint(1, 5)  # Random downward speed
 
+        self.width = 95
+        self.height = 113
+
         # Load cockroach image
         self.cockroach_image = pygame.image.load('res/cockroach.png')
 

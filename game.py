@@ -16,7 +16,7 @@ SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 400
 
 class MyGame:
-    def _init_(self) -> None:
+    def __init__(self) -> None:
         # Open the webcam (0 is usually the default)
         self.cap = cv2.VideoCapture(0)
 
@@ -56,17 +56,28 @@ class MyGame:
             if asteroid.y >= SCREEN_HEIGHT:
                 self.asteroids.remove(asteroid)
     
-    def detect_collision(self, x, y):
-        cockroaches_copy = self.cockroaches.copy()
+    def detect_collision(self, x, y, w, h):
+        cockroaches_to_remove = []
+        for cockroach in self.cockroaches:
+            # Calculate left, right, top, and bottom boundaries of the cockroach
+            cockroach_left = cockroach.x
+            cockroach_right = cockroach.x + cockroach.width
+            cockroach_top = cockroach.y
+            cockroach_bottom = cockroach.y + cockroach.height
 
-        # Iterate through the list of cockroaches
-        for cockroach in cockroaches_copy:
-            # Check if the detection rectangle intersects with the cockroach
-            if x < cockroach.x < x + self.w and y < cockroach.y < y + self.h:
-                # Remove the cockroach from the list
-                self.cockroaches.remove(cockroach)
-                return True
-        return False
+            # Calculate left, right, top, and bottom boundaries of the detection rectangle
+            detection_left = x
+            detection_right = x + w
+            detection_top = y
+            detection_bottom = y + h
+
+            # Check for overlap
+            if (cockroach_right >= detection_left and cockroach_left <= detection_right) and \
+               (cockroach_bottom >= detection_top and cockroach_top <= detection_bottom):
+                cockroaches_to_remove.append(cockroach)
+
+        for cockroach in cockroaches_to_remove:
+            self.cockroaches.remove(cockroach)
 
     def start_game(self):
 
@@ -107,8 +118,9 @@ class MyGame:
 
             # If largest contour is present, draw a green rectangle
             if largest_contour is not None:
-                x, y, self.w, self.h = cv2.boundingRect(largest_contour)
-                cv2.rectangle(frame, (x, y), (x + self.w, y + self.h), (0, 255, 0), 2)
+                x, y, w, h = cv2.boundingRect(largest_contour)
+                self.detect_collision(x, y, w, h)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
             
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -118,10 +130,6 @@ class MyGame:
             # Draw the camera feed as the background
             self.screen.blit(frame_pygame, (0, 0))
 
-            try:
-                self.detect_collision(x,y)
-            except:
-                print('passing')
             # Draw the cockroach panel x,yon top of the camera feed
             for cockroach in self.cockroaches:
                 cockroach.draw(self.screen)
@@ -158,7 +166,7 @@ class MyGame:
         # Signal the camera feed thread to stop
         self.stop_event.set()
 
-if __name__ == '_main_':
+if __name__ == '__main__':
     game = MyGame()
 
     # Start the webcam feed and cockroach panel together
