@@ -40,7 +40,7 @@ class MyGame:
             self.cockroaches.append(Cockroach())
 
         # Spawn a new asteroid randomly
-        if len(self.asteroids) < 5 and random.random() < 0.02:
+        if len(self.asteroids) < 2 and random.random() < 0.016:
             self.asteroids.append(Asteroid())
 
     def move_objects(self):
@@ -101,7 +101,7 @@ class MyGame:
 
         for asteroid in asteroids_to_remove:
             # TODO: GAME OVER AFTER HITTING 5
-            pass
+            print('detected')
 
     def start_game(self):
 
@@ -144,6 +144,7 @@ class MyGame:
             if largest_contour is not None:
                 x, y, w, h = cv2.boundingRect(largest_contour)
                 self.detect_collision_cockroach(x, y, w, h)
+                self.detect_collision_asteroid(x, y, w, h)
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
             
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)

@@ -7,6 +7,9 @@ class Asteroid:
         self.y = 60  # Starting y position at the top
         self.speed_y = random.randint(1, 3)  # Random downward speed
 
+        self.width = 92
+        self.height = 92
+
         # Load asteroid image
         self.asteroid_image = pygame.image.load('res/asteroid.png')
 
