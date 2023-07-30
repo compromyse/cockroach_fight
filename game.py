@@ -55,6 +55,16 @@ class MyGame:
             asteroid.move_down()
             if asteroid.y >= SCREEN_HEIGHT:
                 self.asteroids.remove(asteroid)
+    
+    def detect_collision(self, x, y):
+        # Iterate through the list of cockroaches
+        for cockroach in self.cockroaches:
+            # Check if the detection rectangle intersects with the cockroach
+            if x < cockroach.x < x + self.w and y < cockroach.y < y + self.h:
+                # Remove the cockroach from the list
+                self.cockroaches.remove(cockroach)
+                return True
+        return False
 
     def start_game(self):
 
@@ -95,8 +105,8 @@ class MyGame:
 
             # If largest contour is present, draw a green rectangle
             if largest_contour is not None:
-                x, y, w, h = cv2.boundingRect(largest_contour)
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                x, y, self.w, self.h = cv2.boundingRect(largest_contour)
+                cv2.rectangle(frame, (x, y), (x + self.w, y + self.h), (0, 255, 0), 2)
             
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -105,8 +115,8 @@ class MyGame:
 
             # Draw the camera feed as the background
             self.screen.blit(frame_pygame, (0, 0))
-
-            # Draw the cockroach panel on top of the camera feed
+            self.detect_collision(x,y)
+            # Draw the cockroach panel x,yon top of the camera feed
             for cockroach in self.cockroaches:
                 cockroach.draw(self.screen)
 
