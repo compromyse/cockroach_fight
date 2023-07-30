@@ -9,8 +9,8 @@ from cockroach_game import Cockroach
 pygame.init()
 
 # Define screen dimensions
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 802
+SCREEN_HEIGHT = 601
 
 # Load cockroach image
 cockroach_image = pygame.image.load('res/cockroach.png')
