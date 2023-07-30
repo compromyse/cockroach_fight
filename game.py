@@ -143,12 +143,18 @@ class MyGame:
             # Convert frame from RGB to HSV, and define frame used for detection
             det_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-            # Define lower green and upper green            
-            lower_green = np.array([60, 100, 100])
-            upper_green = np.array([100, 255, 255])
+            # Define lower green and upper green ranges
+            lower_green1 = np.array([0, 100, 100])
+            upper_green1 = np.array([30, 255, 255])
 
-            # Define green mask
-            green_mask = cv2.inRange(det_frame, lower_green, upper_green)
+            lower_green2 = np.array([60, 100, 100])
+            upper_green2 = np.array([100, 255, 255])
+
+            # Combine the green masks
+            green_mask1 = cv2.inRange(det_frame, lower_green1, upper_green1)
+            green_mask2 = cv2.inRange(det_frame, lower_green2, upper_green2)
+            green_mask = cv2.bitwise_or(green_mask1, green_mask2)
+
 
             # Detect contours            
             contours, _ = cv2.findContours(green_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
