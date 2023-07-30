@@ -13,13 +13,13 @@ from asteroid import Asteroid
 pygame.init()
 
 # Define screen dimensions
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 400
+SCREEN_WIDTH = 1920
+SCREEN_HEIGHT = 1080
 
 class MyGame:
     def __init__(self) -> None:
         # Open the webcam (0 is usually the default)
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture('rtsp://10.20.89.139:8080/h264_aac.sdp')
 
         # Create a list to hold cockroaches
         self.cockroaches = []
