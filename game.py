@@ -56,7 +56,7 @@ class MyGame:
             if asteroid.y >= SCREEN_HEIGHT:
                 self.asteroids.remove(asteroid)
     
-    def detect_collision(self, x, y, w, h):
+    def detect_collision_cockroach(self, x, y, w, h):
         cockroaches_to_remove = []
         for cockroach in self.cockroaches:
             # Calculate left, right, top, and bottom boundaries of the cockroach
@@ -78,6 +78,30 @@ class MyGame:
 
         for cockroach in cockroaches_to_remove:
             self.cockroaches.remove(cockroach)
+
+    def detect_collision_asteroid(self, x, y, w, h):
+        asteroids_to_remove = []
+        for asteroid in self.asteroids:
+            # Calculate left, right, top, and bottom boundaries of the cockroach
+            asteroid_left = asteroid.x
+            asteroid_right = asteroid.x + asteroid.width
+            asteroid_top = asteroid.y
+            asteroid_bottom = asteroid.y + asteroid.height
+
+            # Calculate left, right, top, and bottom boundaries of the detection rectangle
+            detection_left = x
+            detection_right = x + w
+            detection_top = y
+            detection_bottom = y + h
+
+            # Check for overlap
+            if (asteroid_right >= detection_left and asteroid_left <= detection_right) and \
+               (asteroid_bottom >= detection_top and asteroid_top <= detection_bottom):
+                asteroids_to_remove.append(asteroid)
+
+        for asteroid in asteroids_to_remove:
+            # TODO: GAME OVER AFTER HITTING 5
+            pass
 
     def start_game(self):
 
@@ -119,7 +143,7 @@ class MyGame:
             # If largest contour is present, draw a green rectangle
             if largest_contour is not None:
                 x, y, w, h = cv2.boundingRect(largest_contour)
-                self.detect_collision(x, y, w, h)
+                self.detect_collision_cockroach(x, y, w, h)
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
             
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
