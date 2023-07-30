@@ -139,7 +139,6 @@ class MyGame:
 
             # Rotate the frame counter-clockwise by 90 degrees
             frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
-            frame = cv2.flip(frame, 0)
 
             # Convert frame from RGB to HSV, and define frame used for detection
             det_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
