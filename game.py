@@ -24,6 +24,11 @@ class MyGame:
         self.cockroaches = []
         self.asteroids = []
 
+        self.detect_x = 0
+        self.detect_y = 0
+        self.detect_w = 0
+        self.detect_h = 0
+
         # Create the game screen
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption('Camera Feed and Cockroach Panel')
@@ -56,17 +61,15 @@ class MyGame:
             if asteroid.y >= SCREEN_HEIGHT:
                 self.asteroids.remove(asteroid)
     
-    def detect_collision(self, x, y):
-        cockroaches_copy = self.cockroaches.copy()
+    def detect_collision(self):
+        cockroaches_to_remove = []
+        for cockroach in self.cockroaches:
+            if (self.detect_x < cockroach.x < self.detect_x + self.detect_w and
+                self.detect_y < cockroach.y < self.detect_y + self.detect_h):
+                cockroaches_to_remove.append(cockroach)
 
-        # Iterate through the list of cockroaches
-        for cockroach in cockroaches_copy:
-            # Check if the detection rectangle intersects with the cockroach
-            if x < cockroach.x < x + self.w and y < cockroach.y < y + self.h:
-                # Remove the cockroach from the list
-                self.cockroaches.remove(cockroach)
-                return True
-        return False
+        for cockroach in cockroaches_to_remove:
+            self.cockroaches.remove(cockroach)
 
     def start_game(self):
 
@@ -118,10 +121,7 @@ class MyGame:
             # Draw the camera feed as the background
             self.screen.blit(frame_pygame, (0, 0))
 
-            try:
-                self.detect_collision(x,y)
-            except:
-                print('passing')
+            self.detect_collision()
             # Draw the cockroach panel x,yon top of the camera feed
             for cockroach in self.cockroaches:
                 cockroach.draw(self.screen)
