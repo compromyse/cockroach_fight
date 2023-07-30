@@ -40,7 +40,7 @@ class MyGame:
             self.cockroaches.append(Cockroach())
 
         # Spawn a new asteroid randomly
-        if len(self.asteroids) < 2 and random.random() < 0.016:
+        if len(self.asteroids) < 2 and random.random() < .016:
             self.asteroids.append(Asteroid())
 
     def move_objects(self):
@@ -128,8 +128,8 @@ class MyGame:
             det_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
             # Define lower green and upper green            
-            lower_green = np.array([60, 100, 100])
-            upper_green = np.array([100, 255, 255])
+            lower_green = np.array([0, 255, 100])
+            upper_green = np.array([0, 255, 3])
 
             # Define green mask
             green_mask = cv2.inRange(det_frame, lower_green, upper_green)
