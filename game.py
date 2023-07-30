@@ -16,18 +16,13 @@ SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 400
 
 class MyGame:
-    def __init__(self) -> None:
+    def _init_(self) -> None:
         # Open the webcam (0 is usually the default)
         self.cap = cv2.VideoCapture(0)
 
         # Create a list to hold cockroaches
         self.cockroaches = []
         self.asteroids = []
-
-        self.detect_x = 0
-        self.detect_y = 0
-        self.detect_w = 0
-        self.detect_h = 0
 
         # Create the game screen
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -61,15 +56,17 @@ class MyGame:
             if asteroid.y >= SCREEN_HEIGHT:
                 self.asteroids.remove(asteroid)
     
-    def detect_collision(self):
-        cockroaches_to_remove = []
-        for cockroach in self.cockroaches:
-            if (self.detect_x < cockroach.x < self.detect_x + self.detect_w and
-                self.detect_y < cockroach.y < self.detect_y + self.detect_h):
-                cockroaches_to_remove.append(cockroach)
+    def detect_collision(self, x, y):
+        cockroaches_copy = self.cockroaches.copy()
 
-        for cockroach in cockroaches_to_remove:
-            self.cockroaches.remove(cockroach)
+        # Iterate through the list of cockroaches
+        for cockroach in cockroaches_copy:
+            # Check if the detection rectangle intersects with the cockroach
+            if x < cockroach.x < x + self.w and y < cockroach.y < y + self.h:
+                # Remove the cockroach from the list
+                self.cockroaches.remove(cockroach)
+                return True
+        return False
 
     def start_game(self):
 
@@ -121,7 +118,10 @@ class MyGame:
             # Draw the camera feed as the background
             self.screen.blit(frame_pygame, (0, 0))
 
-            self.detect_collision()
+            try:
+                self.detect_collision(x,y)
+            except:
+                print('passing')
             # Draw the cockroach panel x,yon top of the camera feed
             for cockroach in self.cockroaches:
                 cockroach.draw(self.screen)
@@ -158,7 +158,7 @@ class MyGame:
         # Signal the camera feed thread to stop
         self.stop_event.set()
 
-if __name__ == '__main__':
+if __name__ == '_main_':
     game = MyGame()
 
     # Start the webcam feed and cockroach panel together
