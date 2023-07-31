@@ -39,7 +39,7 @@ class MyGame:
         self.stop_event = threading.Event()
 
         # Game state variables
-        self.lives = 5
+        self.lives = 10
         self.game_over = False
         self.score = 0
 
